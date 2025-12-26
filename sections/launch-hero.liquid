@@ -498,13 +498,37 @@
             gap: 1.5rem;
         }
         
+        .launch-header {
+            margin-bottom: 2.5rem;
+        }
+        
+        .launch-subtitle {
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+        
         .countdown-container {
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 360px;
+        }
+        
+        .countdown-separator {
+            display: none;
         }
         
         .countdown-item {
-            min-width: 60px;
+            min-width: unset;
+        }
+        
+        .countdown-value {
+            font-size: 2.2rem;
+        }
+        
+        .countdown-label {
+            font-size: 0.6rem;
         }
         
         .signup-form {

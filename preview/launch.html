@@ -272,19 +272,20 @@
     .signup-form {
         display: flex;
         gap: 0;
-        max-width: 450px;
+        max-width: 400px;
         margin: 0 auto;
     }
     
     .signup-form input {
         flex: 1;
-        padding: 1rem 1.5rem;
+        padding: 0.85rem 1.2rem;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-right: none;
+        border-radius: 8px 0 0 8px;
         color: var(--sponge-white);
         font-family: 'Georgia', serif;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         outline: none;
         transition: all 0.3s ease;
     }
@@ -300,12 +301,13 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 1rem 1.5rem;
+        padding: 0.85rem 1.2rem;
         background: linear-gradient(135deg, var(--sponge-violet), var(--sponge-blue));
         border: none;
+        border-radius: 0 8px 8px 0;
         color: var(--sponge-white);
         font-family: 'Courier New', monospace;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         letter-spacing: 0.1em;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -405,18 +407,39 @@
     @media (max-width: 768px) {
         .launch-nav { padding: 1.5rem 2rem; }
         .nav-links { gap: 1.5rem; }
-        .countdown-container { flex-wrap: wrap; justify-content: center; }
-        .countdown-item { min-width: 60px; }
-        .signup-form { flex-direction: column; }
+        
+        .launch-main {
+            justify-content: flex-start;
+            padding-top: 28vh;
+        }
+        
+        .launch-header { margin-bottom: 2.5rem; }
+        .launch-subtitle { font-size: 1rem; padding: 0 1rem; }
+        
+        .countdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 360px;
+        }
+        .countdown-separator { display: none; }
+        .countdown-item { min-width: unset; }
+        .countdown-value { font-size: 2.2rem; }
+        .countdown-label { font-size: 0.6rem; }
+        
+        .signup-form { 
+            flex-direction: column;
+            max-width: 320px;
+        }
         .signup-form input {
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             border-bottom: none;
+            border-radius: 8px 8px 0 0;
         }
-        .teaser-grid {
-            grid-template-columns: repeat(2, 1fr);
-            max-width: 300px;
+        .signup-form button {
+            border-radius: 0 0 8px 8px;
         }
-        .teaser-grid .teaser-item:last-child { grid-column: span 2; }
     }
 </style>
 
