@@ -1,15 +1,22 @@
-{% comment %}
-    Launch Hero Section - SPoNGe
-    Countdown timer with aurora background
-{% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launch - SPoNGe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
 <!-- Navigation -->
 <nav class="launch-nav">
-    <a href="/" class="nav-logo">SPoNGe</a>
+    <a href="../index.html" class="nav-logo">SPoNGe</a>
     <div class="nav-links">
-        <a href="/pages/about">About</a>
-        <a href="/pages/launch" class="active">Launch</a>
-        <a href="/collections/all">Shop</a>
+        <a href="about.html">About</a>
+        <a href="launch.html" class="active">Launch</a>
+        <a href="shop.html">Shop</a>
     </div>
 </nav>
 
@@ -18,12 +25,9 @@
 
 <!-- Main Content -->
 <main class="launch-main">
-    <!-- Glitch Title -->
     <div class="launch-header">
-        <h1 class="glitch-title" data-text="{{ section.settings.title | default: 'DROPPING SOON' }}">
-            {{ section.settings.title | default: 'DROPPING SOON' }}
-        </h1>
-        <p class="launch-subtitle">{{ section.settings.subtitle | default: 'Something extraordinary is emerging from the dark' }}</p>
+        <h1 class="glitch-title" data-text="DROPPING SOON">DROPPING SOON</h1>
+        <p class="launch-subtitle">Something extraordinary is emerging from the dark</p>
     </div>
     
     <!-- Countdown Timer -->
@@ -51,7 +55,7 @@
     
     <!-- Email Signup -->
     <div class="signup-container">
-        <p class="signup-text">{{ section.settings.signup_text | default: 'Be the first to know when we launch' }}</p>
+        <p class="signup-text">Be the first to know when we launch</p>
         <form class="signup-form" id="launch-signup">
             <input type="email" placeholder="Enter your email" required>
             <button type="submit">
@@ -64,59 +68,30 @@
         <p class="signup-success" id="signup-success">You're on the list ✦</p>
     </div>
     
-    <!-- Teaser Grid -->
-    {% if section.settings.show_teasers %}
-    <div class="teaser-grid">
-        <div class="teaser-item">
-            <div class="teaser-blur"></div>
-            <span class="teaser-label">???</span>
-        </div>
-        <div class="teaser-item">
-            <div class="teaser-blur"></div>
-            <span class="teaser-label">???</span>
-        </div>
-        <div class="teaser-item">
-            <div class="teaser-blur"></div>
-            <span class="teaser-label">???</span>
-        </div>
-    </div>
-    {% endif %}
 </main>
 
-<!-- Floating Particles -->
+<!-- Particles -->
 <div class="particles" id="particles"></div>
 
 <style>
-    /* ========================================
-       LAUNCH PAGE - SPONGE
-       ======================================== */
-    
     :root {
         --sponge-black: #0a0a0c;
         --sponge-white: #f5f5f7;
         --sponge-violet: #9b8fd9;
         --sponge-blue: #4a90d9;
-        --sponge-yellow: #f5d547;
     }
     
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
         background: var(--sponge-black);
         color: var(--sponge-white);
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: 'Libre Baskerville', Georgia, serif;
         min-height: 100vh;
         overflow-x: hidden;
     }
     
-    /* ========================================
-       NAVIGATION
-       ======================================== */
-    
+    /* Navigation */
     .launch-nav {
         position: fixed;
         top: 0;
@@ -137,10 +112,7 @@
         text-decoration: none;
     }
     
-    .nav-links {
-        display: flex;
-        gap: 3rem;
-    }
+    .nav-links { display: flex; gap: 3rem; }
     
     .nav-links a {
         font-size: 0.9rem;
@@ -151,15 +123,9 @@
         transition: opacity 0.3s ease;
     }
     
-    .nav-links a:hover,
-    .nav-links a.active {
-        opacity: 1;
-    }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
     
-    /* ========================================
-       AURORA BACKGROUND
-       ======================================== */
-    
+    /* Aurora Background */
     #launch-aurora {
         position: fixed;
         top: 0;
@@ -169,10 +135,7 @@
         z-index: 0;
     }
     
-    /* ========================================
-       MAIN CONTENT
-       ======================================== */
-    
+    /* Main Content */
     .launch-main {
         position: relative;
         z-index: 10;
@@ -185,13 +148,8 @@
         text-align: center;
     }
     
-    /* ========================================
-       GLITCH TITLE
-       ======================================== */
-    
-    .launch-header {
-        margin-bottom: 4rem;
-    }
+    /* Glitch Title */
+    .launch-header { margin-bottom: 4rem; }
     
     .glitch-title {
         font-family: 'Courier New', monospace;
@@ -252,13 +210,9 @@
         font-size: 1.1rem;
         color: rgba(255, 255, 255, 0.6);
         margin-top: 1.5rem;
-        letter-spacing: 0.05em;
     }
     
-    /* ========================================
-       COUNTDOWN TIMER
-       ======================================== */
-    
+    /* Countdown Timer */
     .countdown-container {
         display: flex;
         align-items: center;
@@ -276,7 +230,6 @@
     .countdown-value {
         font-family: 'Courier New', monospace;
         font-size: clamp(2.5rem, 6vw, 4rem);
-        font-weight: 400;
         background: linear-gradient(180deg, var(--sponge-white), rgba(255, 255, 255, 0.6));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -306,13 +259,8 @@
         50% { opacity: 1; }
     }
     
-    /* ========================================
-       EMAIL SIGNUP
-       ======================================== */
-    
-    .signup-container {
-        margin-bottom: 4rem;
-    }
+    /* Email Signup */
+    .signup-container { margin-bottom: 4rem; }
     
     .signup-text {
         font-size: 0.9rem;
@@ -341,9 +289,7 @@
         transition: all 0.3s ease;
     }
     
-    .signup-form input::placeholder {
-        color: rgba(255, 255, 255, 0.3);
-    }
+    .signup-form input::placeholder { color: rgba(255, 255, 255, 0.3); }
     
     .signup-form input:focus {
         background: rgba(255, 255, 255, 0.08);
@@ -375,7 +321,6 @@
         margin-top: 1rem;
         color: var(--sponge-violet);
         font-size: 0.9rem;
-        letter-spacing: 0.1em;
     }
     
     .signup-success.show {
@@ -388,16 +333,12 @@
         to { opacity: 1; transform: translateY(0); }
     }
     
-    /* ========================================
-       TEASER GRID
-       ======================================== */
-    
+    /* Teaser Grid */
     .teaser-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
         max-width: 600px;
-        margin: 0 auto;
     }
     
     .teaser-item {
@@ -434,10 +375,7 @@
         z-index: 1;
     }
     
-    /* ========================================
-       PARTICLES
-       ======================================== */
-    
+    /* Particles */
     .particles {
         position: fixed;
         inset: 0;
@@ -457,156 +395,104 @@
     }
     
     @keyframes particleFloat {
-        0% {
-            opacity: 0;
-            transform: translateY(100vh) scale(0);
-        }
-        10% {
-            opacity: 0.8;
-        }
-        90% {
-            opacity: 0.8;
-        }
-        100% {
-            opacity: 0;
-            transform: translateY(-100vh) scale(1);
-        }
+        0% { opacity: 0; transform: translateY(100vh) scale(0); }
+        10% { opacity: 0.8; }
+        90% { opacity: 0.8; }
+        100% { opacity: 0; transform: translateY(-100vh) scale(1); }
     }
     
-    /* ========================================
-       RESPONSIVE
-       ======================================== */
-    
+    /* Responsive */
     @media (max-width: 768px) {
-        .launch-nav {
-            padding: 1.5rem 2rem;
-        }
-        
-        .nav-links {
-            gap: 1.5rem;
-        }
-        
-        .countdown-container {
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .countdown-item {
-            min-width: 60px;
-        }
-        
-        .signup-form {
-            flex-direction: column;
-        }
-        
+        .launch-nav { padding: 1.5rem 2rem; }
+        .nav-links { gap: 1.5rem; }
+        .countdown-container { flex-wrap: wrap; justify-content: center; }
+        .countdown-item { min-width: 60px; }
+        .signup-form { flex-direction: column; }
         .signup-form input {
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             border-bottom: none;
         }
-        
         .teaser-grid {
             grid-template-columns: repeat(2, 1fr);
             max-width: 300px;
         }
-        
-        .teaser-grid .teaser-item:last-child {
-            grid-column: span 2;
-        }
+        .teaser-grid .teaser-item:last-child { grid-column: span 2; }
     }
 </style>
 
 <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
     
-    // ========================================
-    // AURORA BACKGROUND (Simplified)
-    // ========================================
-    
+    // Aurora Background
     const canvas = document.getElementById('launch-aurora');
-    if (canvas) {
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        const scene = new THREE.Scene();
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    
+    const fragmentShader = `
+        precision highp float;
+        uniform float time;
+        uniform vec2 resolution;
         
-        const fragmentShader = `
-            precision highp float;
-            uniform float time;
-            uniform vec2 resolution;
-            
-            float noise(vec2 p) {
-                return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-            }
-            
-            void main() {
-                vec2 uv = gl_FragCoord.xy / resolution.xy;
-                
-                // Dark background
-                vec3 color = vec3(0.04, 0.04, 0.05);
-                
-                // Aurora glow at top
-                float aurora = smoothstep(0.4, 0.9, uv.y);
-                aurora *= smoothstep(1.0, 0.7, uv.y);
-                
-                // Animated waves
-                float wave = sin(uv.x * 5.0 + time * 0.3) * 0.5 + 0.5;
-                wave += sin(uv.x * 8.0 - time * 0.2) * 0.3;
-                aurora *= wave;
-                
-                // Colors
-                vec3 violet = vec3(0.61, 0.56, 0.85);
-                vec3 blue = vec3(0.29, 0.56, 0.85);
-                
-                vec3 auroraColor = mix(violet, blue, sin(uv.x * 3.0 + time * 0.5) * 0.5 + 0.5);
-                color += auroraColor * aurora * 0.15;
-                
-                // Subtle noise
-                color += (noise(uv * 500.0 + time) - 0.5) * 0.02;
-                
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-        
-        const vertexShader = `
-            void main() {
-                gl_Position = vec4(position, 1.0);
-            }
-        `;
-        
-        const uniforms = {
-            time: { value: 0 },
-            resolution: { value: new THREE.Vector2() }
-        };
-        
-        const geometry = new THREE.PlaneGeometry(2, 2);
-        const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
-        scene.add(new THREE.Mesh(geometry, material));
-        
-        function resize() {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        float noise(vec2 p) {
+            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
         }
         
-        window.addEventListener('resize', resize);
-        resize();
-        
-        function animate(time) {
-            uniforms.time.value = time * 0.001;
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
+        void main() {
+            vec2 uv = gl_FragCoord.xy / resolution.xy;
+            vec3 color = vec3(0.04, 0.04, 0.05);
+            
+            float aurora = smoothstep(0.4, 0.9, uv.y);
+            aurora *= smoothstep(1.0, 0.7, uv.y);
+            
+            float wave = sin(uv.x * 5.0 + time * 0.3) * 0.5 + 0.5;
+            wave += sin(uv.x * 8.0 - time * 0.2) * 0.3;
+            aurora *= wave;
+            
+            vec3 violet = vec3(0.61, 0.56, 0.85);
+            vec3 blue = vec3(0.29, 0.56, 0.85);
+            
+            vec3 auroraColor = mix(violet, blue, sin(uv.x * 3.0 + time * 0.5) * 0.5 + 0.5);
+            color += auroraColor * aurora * 0.15;
+            color += (noise(uv * 500.0 + time) - 0.5) * 0.02;
+            
+            gl_FragColor = vec4(color, 1.0);
         }
-        requestAnimationFrame(animate);
+    `;
+    
+    const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
+    
+    const uniforms = {
+        time: { value: 0 },
+        resolution: { value: new THREE.Vector2() }
+    };
+    
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
+    scene.add(new THREE.Mesh(geometry, material));
+    
+    function resize() {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
     }
     
-    // ========================================
-    // COUNTDOWN TIMER
-    // ========================================
+    window.addEventListener('resize', resize);
+    resize();
     
-    const launchDate = new Date('{{ section.settings.launch_date | default: "2025-02-01T00:00:00" }}').getTime();
+    function animate(time) {
+        uniforms.time.value = time * 0.001;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+    
+    // Countdown Timer - January 24, 2026 at 6pm PT
+    const launchDate = new Date('2026-01-24T18:00:00-08:00');
     
     function updateCountdown() {
         const now = new Date().getTime();
-        const diff = launchDate - now;
+        const diff = launchDate.getTime() - now;
         
         if (diff > 0) {
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -624,12 +510,8 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
     
-    // ========================================
-    // PARTICLES
-    // ========================================
-    
+    // Particles
     const particlesContainer = document.getElementById('particles');
-    
     for (let i = 0; i < 20; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -639,64 +521,16 @@
         particlesContainer.appendChild(particle);
     }
     
-    // ========================================
-    // FORM HANDLER
-    // ========================================
-    
+    // Form Handler
     const form = document.getElementById('launch-signup');
     const success = document.getElementById('signup-success');
     
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        // Here you would typically send to your email service
         success.classList.add('show');
         form.reset();
     });
 </script>
-
-{% schema %}
-{
-    "name": "Launch Hero",
-    "tag": "section",
-    "class": "launch-page",
-    "settings": [
-        {
-            "type": "text",
-            "id": "title",
-            "label": "Title",
-            "default": "DROPPING SOON"
-        },
-        {
-            "type": "text",
-            "id": "subtitle",
-            "label": "Subtitle",
-            "default": "Something extraordinary is emerging from the dark"
-        },
-        {
-            "type": "text",
-            "id": "launch_date",
-            "label": "Launch Date (ISO format)",
-            "default": "2026-01-24T18:00:00-08:00",
-            "info": "Format: YYYY-MM-DDTHH:MM:SS (January 24, 2026 at 6pm PT)"
-        },
-        {
-            "type": "text",
-            "id": "signup_text",
-            "label": "Signup Text",
-            "default": "Be the first to know when we launch"
-        },
-        {
-            "type": "checkbox",
-            "id": "show_teasers",
-            "label": "Show Teaser Grid",
-            "default": false
-        }
-    ],
-    "presets": [
-        {
-            "name": "Launch Hero"
-        }
-    ]
-}
-{% endschema %}
+</body>
+</html>
 
