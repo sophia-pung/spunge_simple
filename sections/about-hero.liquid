@@ -1,0 +1,522 @@
+{% comment %}
+    About Hero Section - SPoNGe
+    Immersive brand story with parallax and aurora accents
+{% endcomment %}
+
+<!-- Navigation -->
+<nav class="about-nav">
+    <a href="/" class="nav-logo">SPoNGe</a>
+    <div class="nav-links">
+        <a href="/pages/about" class="active">About</a>
+        <a href="/pages/launch">Launch</a>
+        <a href="/collections/all">Shop</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <h1 class="hero-title" data-animate>
+            <span class="title-line">For the</span>
+            <span class="title-line accent">Dreamers</span>
+        </h1>
+        <p class="hero-subtitle" data-animate>
+            {{ section.settings.hero_text | default: "Those who cling to a glimmer of hope for a brighter world" }}
+        </p>
+        <div class="scroll-indicator" data-animate>
+            <span>scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Story Sections -->
+<section class="story-section" data-theme="dark">
+    <div class="story-content">
+        <div class="story-number">01</div>
+        <h2>{{ section.settings.section_1_title | default: "Into the Darkness" }}</h2>
+        <p>{{ section.settings.section_1_text | default: "This is a brand for those who have touched darkness. Those who have stared into the belly of the whale and have been swallowed whole, plunged into the night." }}</p>
+    </div>
+    <div class="story-visual">
+        <div class="visual-orb dark"></div>
+    </div>
+</section>
+
+<section class="story-section" data-theme="light">
+    <div class="story-visual">
+        <div class="visual-orb light"></div>
+    </div>
+    <div class="story-content">
+        <div class="story-number">02</div>
+        <h2>{{ section.settings.section_2_title | default: "Finding Light" }}</h2>
+        <p>{{ section.settings.section_2_text | default: "But most importantly, it's for those who emerged. Who found that spark within the void and carried it back to the surface. The ones who chose to glow." }}</p>
+    </div>
+</section>
+
+<section class="story-section" data-theme="aurora">
+    <div class="story-content centered">
+        <div class="story-number">03</div>
+        <h2>{{ section.settings.section_3_title | default: "Art · Technology · Fashion" }}</h2>
+        <p>{{ section.settings.section_3_text | default: "SPoNGe exists at the intersection of creative expression and technical innovation. We craft experiences that remind you: even in the darkest sky, the aurora dances." }}</p>
+    </div>
+    <canvas id="mini-aurora"></canvas>
+</section>
+
+<!-- Closing Section -->
+<section class="about-closing">
+    <div class="closing-content">
+        <blockquote>
+            "{{ section.settings.quote | default: "We are all made of stars that refused to stop burning." }}"
+        </blockquote>
+        <a href="/collections/all" class="cta-button">
+            <span>Explore Collection</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </div>
+</section>
+
+<style>
+    /* ========================================
+       ABOUT PAGE - SPONGE
+       ======================================== */
+    
+    :root {
+        --sponge-black: #0a0a0c;
+        --sponge-white: #f5f5f7;
+        --sponge-violet: #9b8fd9;
+        --sponge-blue: #4a90d9;
+        --sponge-yellow: #f5d547;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: var(--sponge-black);
+        color: var(--sponge-white);
+        font-family: 'Georgia', 'Times New Roman', serif;
+        overflow-x: hidden;
+    }
+    
+    /* ========================================
+       NAVIGATION
+       ======================================== */
+    
+    .about-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 4rem;
+        mix-blend-mode: difference;
+    }
+    
+    .nav-logo {
+        font-family: 'Courier New', monospace;
+        font-size: 1.2rem;
+        letter-spacing: 0.3em;
+        color: var(--sponge-white);
+        text-decoration: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 3rem;
+    }
+    
+    .nav-links a {
+        font-size: 0.9rem;
+        letter-spacing: 0.15em;
+        color: var(--sponge-white);
+        text-decoration: none;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active {
+        opacity: 1;
+    }
+    
+    /* ========================================
+       HERO SECTION
+       ======================================== */
+    
+    .about-hero {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .hero-bg {
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(ellipse 80% 50% at 50% 0%, rgba(155, 143, 217, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 40% at 70% 20%, rgba(74, 144, 217, 0.1) 0%, transparent 40%),
+            var(--sponge-black);
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .hero-title {
+        font-size: clamp(3rem, 12vw, 10rem);
+        font-weight: 400;
+        line-height: 1;
+        margin-bottom: 2rem;
+    }
+    
+    .title-line {
+        display: block;
+        opacity: 0;
+        transform: translateY(40px);
+        animation: fadeUp 1s ease forwards;
+    }
+    
+    .title-line:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .title-line.accent {
+        background: linear-gradient(135deg, var(--sponge-violet), var(--sponge-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.4rem);
+        max-width: 500px;
+        margin: 0 auto 4rem;
+        opacity: 0;
+        animation: fadeUp 1s ease 0.4s forwards;
+        color: rgba(255, 255, 255, 0.6);
+        letter-spacing: 0.05em;
+    }
+    
+    .scroll-indicator {
+        opacity: 0;
+        animation: fadeUp 1s ease 0.6s forwards;
+    }
+    
+    .scroll-indicator span {
+        display: block;
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .scroll-line {
+        width: 1px;
+        height: 60px;
+        background: linear-gradient(to bottom, var(--sponge-white), transparent);
+        margin: 0 auto;
+        animation: scrollPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes fadeUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes scrollPulse {
+        0%, 100% { opacity: 0.3; transform: scaleY(1); }
+        50% { opacity: 0.6; transform: scaleY(1.2); }
+    }
+    
+    /* ========================================
+       STORY SECTIONS
+       ======================================== */
+    
+    .story-section {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        padding: 4rem;
+        position: relative;
+    }
+    
+    .story-section[data-theme="dark"] {
+        background: linear-gradient(135deg, #0a0a0c 0%, #12121a 100%);
+    }
+    
+    .story-section[data-theme="light"] {
+        background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+    }
+    
+    .story-section[data-theme="aurora"] {
+        background: linear-gradient(135deg, #0a0a0c 0%, #0d0d14 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .story-content {
+        padding: 4rem;
+    }
+    
+    .story-content.centered {
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .story-number {
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.3em;
+        color: var(--sponge-violet);
+        margin-bottom: 1.5rem;
+    }
+    
+    .story-content h2 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 400;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .story-content p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 500px;
+    }
+    
+    .story-content.centered p {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* Visual Orbs */
+    .story-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    
+    .visual-orb {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .visual-orb.dark {
+        background: radial-gradient(circle at 30% 30%, #1a1a2e, #000);
+        box-shadow: 
+            inset 0 0 60px rgba(0, 0, 0, 0.8),
+            0 0 80px rgba(155, 143, 217, 0.2);
+        animation: orbFloat 6s ease-in-out infinite;
+    }
+    
+    .visual-orb.light {
+        background: radial-gradient(circle at 70% 30%, var(--sponge-violet), var(--sponge-blue), #1a1a2e);
+        box-shadow: 
+            0 0 100px rgba(155, 143, 217, 0.4),
+            0 0 200px rgba(74, 144, 217, 0.2);
+        animation: orbFloat 6s ease-in-out infinite reverse;
+    }
+    
+    @keyframes orbFloat {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-20px) scale(1.02); }
+    }
+    
+    /* Mini Aurora Canvas */
+    #mini-aurora {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    
+    /* ========================================
+       CLOSING SECTION
+       ======================================== */
+    
+    .about-closing {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem;
+        background: linear-gradient(to bottom, var(--sponge-black), #0d0d14);
+    }
+    
+    .closing-content {
+        text-align: center;
+    }
+    
+    .closing-content blockquote {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        font-style: italic;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--sponge-white);
+        text-decoration: none;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        letter-spacing: 0.2em;
+        transition: all 0.4s ease;
+    }
+    
+    .cta-button:hover {
+        background: rgba(155, 143, 217, 0.1);
+        border-color: var(--sponge-violet);
+        transform: translateX(5px);
+    }
+    
+    .cta-button svg {
+        transition: transform 0.4s ease;
+    }
+    
+    .cta-button:hover svg {
+        transform: translateX(5px);
+    }
+    
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    
+    @media (max-width: 1024px) {
+        .story-section {
+            grid-template-columns: 1fr;
+            min-height: auto;
+            padding: 6rem 2rem;
+        }
+        
+        .story-section[data-theme="light"] {
+            direction: ltr;
+        }
+        
+        .story-section[data-theme="light"] .story-visual {
+            order: -1;
+        }
+        
+        .story-visual {
+            margin: 3rem 0;
+        }
+        
+        .visual-orb {
+            width: 200px;
+            height: 200px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .about-nav {
+            padding: 1.5rem 2rem;
+        }
+        
+        .nav-links {
+            gap: 1.5rem;
+        }
+        
+        .story-content {
+            padding: 2rem 0;
+        }
+    }
+</style>
+
+{% schema %}
+{
+    "name": "About Hero",
+    "tag": "section",
+    "class": "about-page",
+    "settings": [
+        {
+            "type": "text",
+            "id": "hero_text",
+            "label": "Hero Subtitle",
+            "default": "Those who cling to a glimmer of hope for a brighter world"
+        },
+        {
+            "type": "text",
+            "id": "section_1_title",
+            "label": "Section 1 Title",
+            "default": "Into the Darkness"
+        },
+        {
+            "type": "textarea",
+            "id": "section_1_text",
+            "label": "Section 1 Text",
+            "default": "This is a brand for those who have touched darkness. Those who have stared into the belly of the whale and have been swallowed whole, plunged into the night."
+        },
+        {
+            "type": "text",
+            "id": "section_2_title",
+            "label": "Section 2 Title",
+            "default": "Finding Light"
+        },
+        {
+            "type": "textarea",
+            "id": "section_2_text",
+            "label": "Section 2 Text",
+            "default": "But most importantly, it's for those who emerged. Who found that spark within the void and carried it back to the surface. The ones who chose to glow."
+        },
+        {
+            "type": "text",
+            "id": "section_3_title",
+            "label": "Section 3 Title",
+            "default": "Art · Technology · Fashion"
+        },
+        {
+            "type": "textarea",
+            "id": "section_3_text",
+            "label": "Section 3 Text",
+            "default": "SPoNGe exists at the intersection of creative expression and technical innovation. We craft experiences that remind you: even in the darkest sky, the aurora dances."
+        },
+        {
+            "type": "text",
+            "id": "quote",
+            "label": "Closing Quote",
+            "default": "We are all made of stars that refused to stop burning."
+        }
+    ],
+    "presets": [
+        {
+            "name": "About Hero"
+        }
+    ]
+}
+{% endschema %}
+
