@@ -502,9 +502,8 @@
     }
     requestAnimationFrame(animate);
     
-    // Countdown Timer - Set to 30 days from now for demo
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 30);
+    // Countdown Timer - January 25, 2025 at 6pm PT
+    const launchDate = new Date('2025-01-25T18:00:00-08:00');
     
     function updateCountdown() {
         const now = new Date().getTime();
