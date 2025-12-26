@@ -52,16 +52,28 @@
     <!-- Email Signup -->
     <div class="signup-container">
         <p class="signup-text">{{ section.settings.signup_text | default: 'Be the first to know when we launch' }}</p>
-        <form class="signup-form" id="launch-signup">
-            <input type="email" placeholder="Enter your email" required>
+        
+        {% form 'contact', class: 'signup-form' %}
+            <input type="hidden" name="contact[tags]" value="launch-notify">
+            <input type="hidden" name="contact[body]" value="Signed up for launch notification">
+            <input 
+                type="email" 
+                name="contact[email]" 
+                placeholder="Enter your email" 
+                required
+                {% if form.posted_successfully? %}value=""{% endif %}
+            >
             <button type="submit">
                 <span>Notify Me</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
             </button>
-        </form>
-        <p class="signup-success" id="signup-success">You're on the list ✦</p>
+        {% endform %}
+        
+        {% if form.posted_successfully? %}
+            <p class="signup-success show">You're on the list ✦</p>
+        {% endif %}
     </div>
     
     <!-- Teaser Grid -->
