@@ -1,0 +1,42 @@
+{
+    "general": {
+        "password_page": {
+            "login_form_heading": "Enter store using password:",
+            "login_password_button": "Enter using password",
+            "login_form_password_label": "Password",
+            "login_form_password_placeholder": "Your password",
+            "login_form_submit": "Enter",
+            "modal": "Password modal",
+            "title": "Opening soon"
+        }
+    },
+    "products": {
+        "product": {
+            "add_to_cart": "Add to cart",
+            "sold_out": "Sold out",
+            "unavailable": "Unavailable",
+            "quantity": "Quantity",
+            "description": "Description"
+        }
+    },
+    "collections": {
+        "general": {
+            "no_matches": "No products found",
+            "items_with_count": {
+                "one": "{{ count }} item",
+                "other": "{{ count }} items"
+            }
+        }
+    },
+    "cart": {
+        "general": {
+            "title": "Your cart",
+            "empty": "Your cart is empty",
+            "continue_shopping": "Continue shopping",
+            "checkout": "Checkout",
+            "remove": "Remove",
+            "subtotal": "Subtotal"
+        }
+    }
+}
+

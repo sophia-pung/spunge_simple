@@ -1,0 +1,36 @@
+# Unity Project (development only)
+home/ShaderGraph_Aurora_URP/
+ShaderGraph_Aurora_URP/
+*.csproj
+*.sln
+
+# Unity generated
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Shopify
+.shopifyignore
+
+# Environment
+.env
+.env.local
+

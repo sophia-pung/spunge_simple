@@ -1,0 +1,187 @@
+/* ========================================
+   AURORA HOMEPAGE STYLES
+   SPoNGe Brand
+   ======================================== */
+
+:root {
+    --sponge-black: #000000;
+    --sponge-white: #FFFFFF;
+    --sponge-blue: #4A90D9;
+    --sponge-yellow: #F5D547;
+    --aurora-violet: #9B8FD9;
+    --aurora-purple: #7B6BA6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--sponge-black);
+}
+
+/* ========================================
+   CANVAS BACKGROUND
+   ======================================== */
+
+#aurora-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* ========================================
+   NAVIGATION BAR
+   ======================================== */
+
+.nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 2rem 0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+}
+
+nav a {
+    font-family: 'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--sponge-white);
+    text-decoration: none;
+    letter-spacing: 0.15em;
+    opacity: 0.9;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sponge-white), transparent);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateX(-50%);
+}
+
+nav a:hover {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(155, 143, 217, 0.5);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* ========================================
+   CONTENT OVERLAY (for future content)
+   ======================================== */
+
+.content-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-overlay > * {
+    pointer-events: auto;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    nav {
+        gap: 2.5rem;
+    }
+    
+    nav a {
+        font-size: 0.95rem;
+        letter-spacing: 0.12em;
+    }
+    
+    .nav-container {
+        padding: 1.5rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    nav {
+        gap: 1.5rem;
+    }
+    
+    nav a {
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .nav-container {
+        padding: 1rem 0;
+    }
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--sponge-black);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s ease-out;
+}
+
+.loading.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-text {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--sponge-white);
+    letter-spacing: 0.3em;
+    opacity: 0.5;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}
+

@@ -1,0 +1,114 @@
+{% comment %}
+    Product Section - SPoNGe
+{% endcomment %}
+
+<div class="product-page">
+    <div class="product-container">
+        <div class="product-gallery">
+            {% if product.featured_image %}
+                <img src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}">
+            {% endif %}
+        </div>
+        
+        <div class="product-info">
+            <h1 class="product-title">{{ product.title }}</h1>
+            <p class="product-price">{{ product.price | money }}</p>
+            
+            {% form 'product', product %}
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                
+                {% if product.has_only_default_variant == false %}
+                    {% for option in product.options_with_values %}
+                        <div class="product-option">
+                            <label>{{ option.name }}</label>
+                            <select name="options[{{ option.name }}]">
+                                {% for value in option.values %}
+                                    <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <button type="submit" class="add-to-cart-btn">
+                    Add to Cart
+                </button>
+            {% endform %}
+            
+            <div class="product-description">
+                {{ product.description }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-page {
+        min-height: 100vh;
+        padding: 6rem 2rem 4rem;
+        background: var(--sponge-black);
+    }
+    
+    .product-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+    }
+    
+    .product-gallery img {
+        width: 100%;
+        height: auto;
+    }
+    
+    .product-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.8;
+    }
+    
+    .add-to-cart-btn {
+        padding: 1rem 2rem;
+        background: transparent;
+        border: 1px solid var(--sponge-white);
+        color: var(--sponge-white);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        letter-spacing: 0.2em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+    }
+    
+    .add-to-cart-btn:hover {
+        background: var(--sponge-white);
+        color: var(--sponge-black);
+    }
+    
+    .product-description {
+        line-height: 1.8;
+        opacity: 0.8;
+    }
+    
+    @media (max-width: 768px) {
+        .product-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+{% schema %}
+{
+    "name": "Product Main",
+    "tag": "section",
+    "class": "product-main-section"
+}
+{% endschema %}
+

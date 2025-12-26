@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>
+        {{ page_title }}{% unless page_title contains shop.name %} – {{ shop.name }}{% endunless %}
+    </title>
+
+    {% if page_description %}
+        <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    
+    {% if template == 'index' %}
+        {{ 'home.css' | asset_url | stylesheet_tag }}
+    {% endif %}
+
+    {{ content_for_header }}
+</head>
+<body class="template-{{ template | replace: '.', '-' }}">
+    
+    {{ content_for_layout }}
+
+    <!-- Three.js for WebGL shaders -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+
+</body>
+</html>
+

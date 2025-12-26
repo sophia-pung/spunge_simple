@@ -1,0 +1,247 @@
+/* SPoNGe Splash Screen Styles */
+
+:root {
+    --sponge-black: #000000;
+    --sponge-white: #FFFFFF;
+    --sponge-blue: #4A90D9;
+    --sponge-yellow: #F5D547;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'SpongeMono';
+    src: local('Courier New'), local('Consolas'), local('monospace');
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--sponge-black);
+    font-family: 'Courier New', Consolas, monospace;
+}
+
+/* ========================================
+   SPLASH SCREEN CONTAINER
+   ======================================== */
+
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--sponge-black);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+}
+
+/* ========================================
+   ASCII ANIMATION CONTAINER
+   ======================================== */
+
+#ascii-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* ========================================
+   CHROMATIC ABERRATION LAYERS
+   ======================================== */
+
+.ascii-layer {
+    position: absolute;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: clamp(6px, 1.2vw, 14px);
+    line-height: 1.1;
+    letter-spacing: 0.05em;
+    white-space: pre;
+    text-align: center;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+/* White layer - base position */
+#layer-white {
+    color: var(--sponge-white);
+    z-index: 3;
+}
+
+/* Blue layer - offset left and down */
+#layer-blue {
+    color: var(--sponge-blue);
+    transform: translate(-3px, 2px);
+    z-index: 2;
+}
+
+/* Yellow layer - offset right and up */
+#layer-yellow {
+    color: var(--sponge-yellow);
+    transform: translate(3px, -2px);
+    z-index: 1;
+}
+
+/* ========================================
+   BRAND TEXT OVERLAY
+   ======================================== */
+
+#brand-text {
+    position: absolute;
+    bottom: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    opacity: 0;
+    animation: textFadeIn 3s ease-out 2s forwards;
+}
+
+#brand-text p {
+    color: var(--sponge-white);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(12px, 2vw, 18px);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    font-style: italic;
+    text-shadow: 0 0 30px rgba(74, 144, 217, 0.3);
+}
+
+@keyframes textFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    100% {
+        opacity: 0.9;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ========================================
+   ENTER PROMPT
+   ======================================== */
+
+#enter-prompt {
+    position: absolute;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    animation: promptFadeIn 2s ease-out 4s forwards;
+}
+
+#enter-prompt span {
+    color: var(--sponge-white);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: clamp(10px, 1.5vw, 14px);
+    letter-spacing: 0.3em;
+    text-transform: lowercase;
+    opacity: 0.5;
+    animation: promptPulse 2s ease-in-out infinite;
+}
+
+@keyframes promptFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes promptPulse {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* ========================================
+   TRANSITION OVERLAY
+   ======================================== */
+
+#transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--sponge-black);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 200;
+    transition: opacity 1s ease-in-out;
+}
+
+#transition-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ========================================
+   LAMP GLOW EFFECT (Applied via JS)
+   ======================================== */
+
+.glow-char {
+    text-shadow: 
+        0 0 5px var(--sponge-yellow),
+        0 0 10px var(--sponge-yellow),
+        0 0 20px var(--sponge-yellow),
+        0 0 40px var(--sponge-yellow);
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .ascii-layer {
+        font-size: clamp(4px, 2vw, 10px);
+    }
+    
+    #layer-blue {
+        transform: translate(-2px, 1px);
+    }
+    
+    #layer-yellow {
+        transform: translate(2px, -1px);
+    }
+    
+    #brand-text {
+        bottom: 12vh;
+        width: 85%;
+    }
+    
+    #brand-text p {
+        font-size: clamp(11px, 3vw, 16px);
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 480px) {
+    .ascii-layer {
+        font-size: clamp(3px, 2.5vw, 8px);
+    }
+    
+    #brand-text {
+        bottom: 10vh;
+    }
+}
+

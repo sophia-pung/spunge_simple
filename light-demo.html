@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPoNGe - Light Beam Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        #controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        #controls label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        #controls input[type="range"] {
+            width: 150px;
+            margin-left: 10px;
+        }
+        
+        #controls span {
+            color: rgba(255,255,255,0.5);
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="info">move mouse to aim light beam</div>
+    
+    <div id="controls">
+        <label>
+            cone width
+            <input type="range" id="coneWidth" min="0.1" max="1.5" step="0.05" value="0.2">
+            <span id="coneWidthVal">0.2</span>
+        </label>
+        <label>
+            particle density
+            <input type="range" id="density" min="0.3" max="0.95" step="0.05" value="0.5">
+            <span id="densityVal">0.5</span>
+        </label>
+        <label>
+            scanline intensity
+            <input type="range" id="scanlines" min="0" max="1" step="0.1" value="1.0">
+            <span id="scanlinesVal">1.0</span>
+        </label>
+        <label>
+            color saturation
+            <input type="range" id="saturation" min="0" max="1" step="0.1" value="0.4">
+            <span id="saturationVal">0.4</span>
+        </label>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ============================================
+        // VERTEX SHADER (simple passthrough)
+        // ============================================
+        const vertexShader = `
+            varying vec2 vUv;
+            
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        // ============================================
+        // FRAGMENT SHADER (the magic)
+        // ============================================
+        const fragmentShader = `
+            precision highp float;
+            
+            uniform vec2 resolution;
+            uniform vec2 lampPos;       // normalized 0-1
+            uniform float lampAngle;    // radians
+            uniform float coneWidth;    // radians
+            uniform float time;
+            uniform float density;      // particle threshold
+            uniform float scanlineIntensity;
+            uniform float saturation;
+            
+            varying vec2 vUv;
+            
+            // ---- Noise function for particle placement ----
+            float hash(vec2 p) {
+                return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+            }
+            
+            float hash2(vec2 p) {
+                return fract(sin(dot(p, vec2(269.5, 183.3))) * 43758.5453123);
+            }
+            
+            // ---- Color palette (rainbow chromatic) ----
+            vec3 getParticleColor(float t, float sat) {
+                // Rainbow palette
+                vec3 colors[6];
+                colors[0] = vec3(1.0, 0.2, 0.2);   // red
+                colors[1] = vec3(1.0, 0.5, 0.1);   // orange
+                colors[2] = vec3(1.0, 0.9, 0.2);   // yellow
+                colors[3] = vec3(0.2, 0.9, 0.3);   // green
+                colors[4] = vec3(0.2, 0.5, 1.0);   // blue
+                colors[5] = vec3(0.7, 0.2, 1.0);   // purple
+                
+                float idx = t * 5.0;
+                int i = int(floor(idx));
+                float f = fract(idx);
+                
+                vec3 col;
+                if (i == 0) col = mix(colors[0], colors[1], f);
+                else if (i == 1) col = mix(colors[1], colors[2], f);
+                else if (i == 2) col = mix(colors[2], colors[3], f);
+                else if (i == 3) col = mix(colors[3], colors[4], f);
+                else if (i == 4) col = mix(colors[4], colors[5], f);
+                else col = colors[5];
+                
+                // Desaturate based on saturation param
+                vec3 gray = vec3(dot(col, vec3(0.299, 0.587, 0.114)));
+                return mix(gray, col, sat);
+            }
+            
+            void main() {
+                // Aspect ratio correction
+                vec2 uv = vUv;
+                float aspect = resolution.x / resolution.y;
+                vec2 uvAspect = vec2(uv.x * aspect, uv.y);
+                vec2 lampPosAspect = vec2(lampPos.x * aspect, lampPos.y);
+                
+                // Vector from lamp to this pixel
+                vec2 toLamp = uvAspect - lampPosAspect;
+                float dist = length(toLamp);
+                float angle = atan(toLamp.y, toLamp.x);
+                
+                // Normalize angle difference
+                float angleDiff = angle - lampAngle;
+                // Wrap to -PI to PI
+                angleDiff = mod(angleDiff + 3.14159, 6.28318) - 3.14159;
+                
+                // Check if in cone
+                float coneEdge = smoothstep(coneWidth, coneWidth * 0.7, abs(angleDiff));
+                
+                // Distance falloff (brighter near lamp, fades with distance)
+                float distFalloff = 1.0 - smoothstep(0.0, 1.2, dist);
+                
+                // Combine cone shape and distance
+                float lightIntensity = coneEdge * distFalloff;
+                
+                // ---- PARTICLE GENERATION ----
+                // Scale UV for particle grid
+                vec2 particleUV = uv * 400.0; // density of grid
+                vec2 gridCell = floor(particleUV);
+                
+                // Random value for this cell
+                float rand = hash(gridCell);
+                float rand2 = hash2(gridCell);
+                
+                // Threshold - determines if this cell has a particle
+                // Lower density value = more particles
+                float threshold = density - lightIntensity * 0.4;
+                
+                // Animated shimmer
+                float shimmer = sin(time * 2.0 + rand * 6.28) * 0.1;
+                
+                vec3 color = vec3(0.0);
+                
+                if (rand > threshold && lightIntensity > 0.05) {
+                    // This cell has a particle
+                    float colorT = rand2 + shimmer;
+                    colorT = fract(colorT);
+                    
+                    vec3 particleColor = getParticleColor(colorT, saturation);
+                    
+                    // Intensity based on light
+                    float particleIntensity = lightIntensity * (0.7 + rand * 0.3);
+                    
+                    color = particleColor * particleIntensity;
+                }
+                
+                // ---- SCANLINES ----
+                float scanline = 1.0;
+                if (scanlineIntensity > 0.0) {
+                    // Horizontal scanlines
+                    float lineY = mod(gl_FragCoord.y, 4.0);
+                    float scanlinePattern = lineY < 2.0 ? 1.0 : (1.0 - scanlineIntensity * 0.5);
+                    scanline = scanlinePattern;
+                    
+                    // Subtle moving scanline
+                    float movingScan = sin(gl_FragCoord.y * 0.5 - time * 50.0) * 0.5 + 0.5;
+                    movingScan = smoothstep(0.0, 0.1, movingScan);
+                    scanline *= mix(1.0, 0.9, movingScan * scanlineIntensity * 0.3);
+                }
+                
+                color *= scanline;
+                
+                // ---- LAMP GLOW (white center) ----
+                float glowDist = length(uv - lampPos);
+                float glow = exp(-glowDist * 15.0) * 0.8;
+                color += vec3(1.0, 0.95, 0.9) * glow;
+                
+                // ---- Subtle vignette ----
+                float vignette = 1.0 - length(uv - 0.5) * 0.5;
+                color *= vignette;
+                
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        
+        // Uniforms (values we send to the shader)
+        // LOCKED SETTINGS from testing session
+        const uniforms = {
+            resolution: { value: new THREE.Vector2() },
+            lampPos: { value: new THREE.Vector2(0.2, 0.5) },
+            lampAngle: { value: 0.0 },
+            coneWidth: { value: 0.2 },        // tight focused beam
+            time: { value: 0.0 },
+            density: { value: 0.5 },          // dense particles
+            scanlineIntensity: { value: 1.0 }, // strong scanlines
+            saturation: { value: 0.4 }        // muted, cinematic colors
+        };
+        
+        // Create fullscreen quad with our shader
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms
+        });
+        const quad = new THREE.Mesh(geometry, material);
+        scene.add(quad);
+        
+        // ============================================
+        // RESIZE HANDLING
+        // ============================================
+        
+        function resize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const pixelRatio = Math.min(window.devicePixelRatio, 2);
+            
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(pixelRatio);
+            
+            uniforms.resolution.value.set(width * pixelRatio, height * pixelRatio);
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // ============================================
+        // MOUSE TRACKING
+        // ============================================
+        
+        let mouseX = 0.2;
+        let mouseY = 0.5;
+        let targetAngle = 0;
+        
+        function updateMouse(clientX, clientY) {
+            // Convert to normalized coordinates (0-1)
+            const x = clientX / window.innerWidth;
+            const y = 1.0 - (clientY / window.innerHeight); // flip Y
+            
+            // Lamp stays fixed, angle points toward mouse
+            const lampX = uniforms.lampPos.value.x;
+            const lampY = uniforms.lampPos.value.y;
+            
+            // Calculate angle from lamp to mouse
+            const dx = x - lampX;
+            const dy = y - lampY;
+            
+            // Aspect ratio correction
+            const aspect = window.innerWidth / window.innerHeight;
+            const dxCorrected = dx * aspect;
+            
+            targetAngle = Math.atan2(dy, dxCorrected);
+        }
+        
+        window.addEventListener('mousemove', (e) => {
+            updateMouse(e.clientX, e.clientY);
+        });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+        
+        // ============================================
+        // CONTROL PANEL
+        // ============================================
+        
+        document.getElementById('coneWidth').addEventListener('input', (e) => {
+            uniforms.coneWidth.value = parseFloat(e.target.value);
+            document.getElementById('coneWidthVal').textContent = e.target.value;
+        });
+        
+        document.getElementById('density').addEventListener('input', (e) => {
+            uniforms.density.value = parseFloat(e.target.value);
+            document.getElementById('densityVal').textContent = e.target.value;
+        });
+        
+        document.getElementById('scanlines').addEventListener('input', (e) => {
+            uniforms.scanlineIntensity.value = parseFloat(e.target.value);
+            document.getElementById('scanlinesVal').textContent = e.target.value;
+        });
+        
+        document.getElementById('saturation').addEventListener('input', (e) => {
+            uniforms.saturation.value = parseFloat(e.target.value);
+            document.getElementById('saturationVal').textContent = e.target.value;
+        });
+        
+        // ============================================
+        // ANIMATION LOOP
+        // ============================================
+        
+        function animate(time) {
+            // Update time uniform (in seconds)
+            uniforms.time.value = time * 0.001;
+            
+            // Smooth angle interpolation
+            const currentAngle = uniforms.lampAngle.value;
+            uniforms.lampAngle.value += (targetAngle - currentAngle) * 0.1;
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        
+        requestAnimationFrame(animate);
+        
+        console.log('Light beam demo initialized');
+        console.log('Move your mouse to aim the light');
+    </script>
+</body>
+</html>
+

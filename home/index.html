@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    
+    <!-- Google Fonts - Libre Baskerville for elegant serif nav -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <span class="loading-text">loading</span>
+    </div>
+
+    <!-- Aurora Canvas Background -->
+    <canvas id="aurora-canvas"></canvas>
+    
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav>
+            <a href="about.html">About</a>
+            <a href="launch.html">Launch</a>
+            <a href="shop.html">Shop</a>
+        </nav>
+    </div>
+    
+    <!-- Content Overlay (for future content) -->
+    <div class="content-overlay">
+        <!-- Additional content can be added here -->
+    </div>
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+
+    <!-- Aurora Shader Script -->
+    <script type="module">
+        import './js/home.js';
+        
+        // Hide loading screen once shader is ready
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            loading.classList.add('fade-out');
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 1000);
+        }, 500);
+    </script>
+</body>
+</html>
+

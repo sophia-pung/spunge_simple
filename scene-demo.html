@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPoNGe - Scene Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #info {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+        
+        #controls button {
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #controls button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="info">move mouse to aim light · click Walk In to begin</div>
+    
+    <div id="controls">
+        <button id="walkIn">Walk In</button>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ============================================
+        // SPRITE CONFIGURATION
+        // ============================================
+        const SPRITE_CONFIG = {
+            man: {
+                // Light source position relative to sprite (0-1)
+                // LOCKED: eye position
+                lightOffsetX: 0.28,  // 28% from left
+                lightOffsetY: 0.12,  // 12% from top
+            }
+        };
+
+        // ============================================
+        // VERTEX SHADER
+        // ============================================
+        const vertexShader = `
+            varying vec2 vUv;
+            
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        // ============================================
+        // FRAGMENT SHADER - Combined sprite + light beam
+        // ============================================
+        const fragmentShader = `
+            precision highp float;
+            
+            uniform vec2 resolution;
+            uniform float time;
+            
+            // Light beam uniforms
+            uniform vec2 lightPos;      // absolute position on screen (0-1)
+            uniform float lightAngle;   // radians
+            uniform float coneWidth;
+            uniform float density;
+            uniform float scanlineIntensity;
+            uniform float saturation;
+            
+            // Sprite uniforms
+            uniform sampler2D manTexture;
+            uniform vec2 manPos;        // sprite center position (0-1)
+            uniform float manScale;
+            uniform float manAspect;    // width/height of sprite
+            
+            varying vec2 vUv;
+            
+            // ---- Noise function ----
+            float hash(vec2 p) {
+                return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+            }
+            
+            float hash2(vec2 p) {
+                return fract(sin(dot(p, vec2(269.5, 183.3))) * 43758.5453123);
+            }
+            
+            // ---- Color palette ----
+            vec3 getParticleColor(float t, float sat) {
+                vec3 colors[6];
+                colors[0] = vec3(1.0, 0.2, 0.2);
+                colors[1] = vec3(1.0, 0.5, 0.1);
+                colors[2] = vec3(1.0, 0.9, 0.2);
+                colors[3] = vec3(0.2, 0.9, 0.3);
+                colors[4] = vec3(0.2, 0.5, 1.0);
+                colors[5] = vec3(0.7, 0.2, 1.0);
+                
+                float idx = t * 5.0;
+                int i = int(floor(idx));
+                float f = fract(idx);
+                
+                vec3 col;
+                if (i == 0) col = mix(colors[0], colors[1], f);
+                else if (i == 1) col = mix(colors[1], colors[2], f);
+                else if (i == 2) col = mix(colors[2], colors[3], f);
+                else if (i == 3) col = mix(colors[3], colors[4], f);
+                else if (i == 4) col = mix(colors[4], colors[5], f);
+                else col = colors[5];
+                
+                vec3 gray = vec3(dot(col, vec3(0.299, 0.587, 0.114)));
+                return mix(gray, col, sat);
+            }
+            
+            void main() {
+                vec2 uv = vUv;
+                float screenAspect = resolution.x / resolution.y;
+                
+                vec3 finalColor = vec3(0.0);
+                
+                // ========================================
+                // LIGHT BEAM
+                // ========================================
+                vec2 uvAspect = vec2(uv.x * screenAspect, uv.y);
+                vec2 lightPosAspect = vec2(lightPos.x * screenAspect, lightPos.y);
+                
+                vec2 toLight = uvAspect - lightPosAspect;
+                float dist = length(toLight);
+                float angle = atan(toLight.y, toLight.x);
+                
+                float angleDiff = angle - lightAngle;
+                angleDiff = mod(angleDiff + 3.14159, 6.28318) - 3.14159;
+                
+                float coneEdge = smoothstep(coneWidth, coneWidth * 0.7, abs(angleDiff));
+                float distFalloff = 1.0 - smoothstep(0.0, 1.5, dist);
+                float lightIntensity = coneEdge * distFalloff;
+                
+                // Particles
+                vec2 particleUV = uv * 400.0;
+                vec2 gridCell = floor(particleUV);
+                float rand = hash(gridCell);
+                float rand2 = hash2(gridCell);
+                float threshold = density - lightIntensity * 0.4;
+                float shimmer = sin(time * 2.0 + rand * 6.28) * 0.1;
+                
+                if (rand > threshold && lightIntensity > 0.05) {
+                    float colorT = fract(rand2 + shimmer);
+                    vec3 particleColor = getParticleColor(colorT, saturation);
+                    float particleIntensity = lightIntensity * (0.7 + rand * 0.3);
+                    finalColor += particleColor * particleIntensity;
+                }
+                
+                // Scanlines on light beam
+                float scanline = 1.0;
+                if (scanlineIntensity > 0.0 && lightIntensity > 0.01) {
+                    float lineY = mod(gl_FragCoord.y, 4.0);
+                    float scanlinePattern = lineY < 2.0 ? 1.0 : (1.0 - scanlineIntensity * 0.5);
+                    scanline = scanlinePattern;
+                }
+                finalColor *= scanline;
+                
+                // Light source glow
+                float glowDist = length(uv - lightPos);
+                float glow = exp(-glowDist * 20.0) * 0.6;
+                finalColor += vec3(1.0, 0.95, 0.9) * glow;
+                
+                // ========================================
+                // MAN SPRITE
+                // ========================================
+                // Calculate sprite UV
+                float spriteHeight = manScale;
+                float spriteWidth = spriteHeight * manAspect / screenAspect;
+                
+                vec2 spriteMin = manPos - vec2(spriteWidth, spriteHeight) * 0.5;
+                vec2 spriteMax = manPos + vec2(spriteWidth, spriteHeight) * 0.5;
+                
+                if (uv.x >= spriteMin.x && uv.x <= spriteMax.x &&
+                    uv.y >= spriteMin.y && uv.y <= spriteMax.y) {
+                    
+                    // Map screen UV to sprite UV
+                    vec2 spriteUV = (uv - spriteMin) / (spriteMax - spriteMin);
+                    // Flip Y: screen Y=0 is bottom, but we want to map to image top
+                    spriteUV.y = 1.0 - spriteUV.y;
+                    
+                    vec4 spriteColor = texture2D(manTexture, spriteUV);
+                    
+                    // Additive blend (black becomes transparent)
+                    finalColor += spriteColor.rgb;
+                }
+                
+                // ========================================
+                // VIGNETTE
+                // ========================================
+                float vignette = 1.0 - length(uv - 0.5) * 0.4;
+                finalColor *= vignette;
+                
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+        // ============================================
+        // THREE.JS SETUP
+        // ============================================
+        
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        
+        // Load texture
+        const textureLoader = new THREE.TextureLoader();
+        const manTexture = await new Promise((resolve) => {
+            textureLoader.load('assets/man_silhouette.png', (texture) => {
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+                texture.flipY = false; // Don't flip - we handle orientation in shader
+                texture.needsUpdate = true;
+                resolve(texture);
+            });
+        });
+        
+        const manAspect = manTexture.image.width / manTexture.image.height;
+        console.log('Sprite loaded, aspect ratio:', manAspect);
+        
+        // Uniforms
+        const uniforms = {
+            resolution: { value: new THREE.Vector2() },
+            time: { value: 0.0 },
+            
+            // Light beam (locked settings from testing)
+            lightPos: { value: new THREE.Vector2(0.2, 0.5) },
+            lightAngle: { value: 0.0 },
+            coneWidth: { value: 0.2 },
+            density: { value: 0.5 },
+            scanlineIntensity: { value: 1.0 },
+            saturation: { value: 0.4 },
+            
+            // Sprite
+            manTexture: { value: manTexture },
+            manPos: { value: new THREE.Vector2(0.2, 0.5) },
+            manScale: { value: 0.2 },  // 4x smaller
+            manAspect: { value: manAspect }
+        };
+        
+        // Create fullscreen quad
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms
+        });
+        const quad = new THREE.Mesh(geometry, material);
+        scene.add(quad);
+        
+        // ============================================
+        // UPDATE LIGHT POSITION FROM SPRITE
+        // ============================================
+        
+        function updateLightPosition() {
+            const manPos = uniforms.manPos.value;
+            const manScale = uniforms.manScale.value;
+            const screenAspect = window.innerWidth / window.innerHeight;
+            
+            // Sprite dimensions in screen space
+            const spriteHeight = manScale;
+            const spriteWidth = spriteHeight * manAspect / screenAspect;
+            
+            // Light offset within sprite (face position)
+            // lightOffsetX: 0.20 (20% from left of sprite)
+            // lightOffsetY: 0.12 (12% from top of sprite = near the top)
+            // In screen space: top of sprite is +Y, bottom is -Y (relative to center)
+            const lightOffsetX = SPRITE_CONFIG.man.lightOffsetX - 0.5; // 0.20 - 0.5 = -0.30 (left of center)
+            const lightOffsetY = 0.5 - SPRITE_CONFIG.man.lightOffsetY; // 0.5 - 0.12 = 0.38 (above center)
+            
+            // Calculate absolute light position
+            const lightX = manPos.x + lightOffsetX * spriteWidth;
+            const lightY = manPos.y + lightOffsetY * spriteHeight;
+            
+            uniforms.lightPos.value.set(lightX, lightY);
+        }
+        
+        // ============================================
+        // RESIZE HANDLING
+        // ============================================
+        
+        function resize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const pixelRatio = Math.min(window.devicePixelRatio, 2);
+            
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(pixelRatio);
+            
+            uniforms.resolution.value.set(width * pixelRatio, height * pixelRatio);
+            updateLightPosition();
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // ============================================
+        // MOUSE TRACKING - Controls beam direction
+        // ============================================
+        
+        let targetAngle = 0;
+        
+        function updateMouseAngle(clientX, clientY) {
+            // Convert to normalized coordinates (0-1)
+            const mouseX = clientX / window.innerWidth;
+            const mouseY = 1.0 - (clientY / window.innerHeight); // flip Y
+            
+            // Get current light position
+            const lightX = uniforms.lightPos.value.x;
+            const lightY = uniforms.lightPos.value.y;
+            
+            // Calculate angle from light to mouse
+            const dx = mouseX - lightX;
+            const dy = mouseY - lightY;
+            
+            // Aspect ratio correction
+            const aspect = window.innerWidth / window.innerHeight;
+            const dxCorrected = dx * aspect;
+            
+            targetAngle = Math.atan2(dy, dxCorrected);
+        }
+        
+        window.addEventListener('mousemove', (e) => {
+            updateMouseAngle(e.clientX, e.clientY);
+        });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateMouseAngle(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+        
+        // ============================================
+        // WALK IN BUTTON
+        // ============================================
+        
+        let walkAnimation = null;
+        let hasWalkedIn = false;
+        
+        // Start with man off-screen
+        uniforms.manPos.value.x = -0.15;
+        
+        document.getElementById('walkIn').addEventListener('click', () => {
+            if (walkAnimation) cancelAnimationFrame(walkAnimation);
+            
+            const startX = -0.15;
+            const endX = 0.2;
+            const duration = 3000;
+            const startTime = performance.now();
+            
+            // Hide button and info during animation
+            document.getElementById('controls').style.opacity = '0';
+            document.getElementById('info').style.opacity = '0';
+            
+            function animateWalk(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out cubic
+                const eased = 1 - Math.pow(1 - progress, 3);
+                
+                const currentX = startX + (endX - startX) * eased;
+                uniforms.manPos.value.x = currentX;
+                updateLightPosition();
+                
+                if (progress < 1) {
+                    walkAnimation = requestAnimationFrame(animateWalk);
+                } else {
+                    hasWalkedIn = true;
+                    // Keep button hidden after walk in
+                }
+            }
+            
+            walkAnimation = requestAnimationFrame(animateWalk);
+        });
+        
+        // ============================================
+        // ANIMATION LOOP
+        // ============================================
+        
+        function animate(time) {
+            uniforms.time.value = time * 0.001;
+            
+            // Smooth angle interpolation (beam follows mouse)
+            const currentAngle = uniforms.lightAngle.value;
+            uniforms.lightAngle.value += (targetAngle - currentAngle) * 0.08;
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        
+        requestAnimationFrame(animate);
+        
+        // Initial update
+        updateLightPosition();
+        
+        console.log('Scene initialized');
+        console.log('Move mouse to aim light beam');
+        console.log('Click Walk In to begin');
+    </script>
+</body>
+</html>
+
