@@ -5,20 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <!-- Favicons - Different per page -->
-    {% if template == 'page.about' %}
-        <link rel="icon" type="image/png" href="{{ 'About.png' | asset_url }}">
-        <link rel="apple-touch-icon" href="{{ 'About.png' | asset_url }}">
-    {% elsif template == 'page.launch' %}
-        <link rel="icon" type="image/png" href="{{ 'Home.png' | asset_url }}">
-        <link rel="apple-touch-icon" href="{{ 'Home.png' | asset_url }}">
-    {% elsif template == 'collection' %}
-        <link rel="icon" type="image/png" href="{{ 'Shop.png' | asset_url }}">
-        <link rel="apple-touch-icon" href="{{ 'Shop.png' | asset_url }}">
-    {% else %}
-        <link rel="icon" type="image/png" href="{{ 'Home.png' | asset_url }}">
-        <link rel="apple-touch-icon" href="{{ 'Home.png' | asset_url }}">
-    {% endif %}
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ 'Favicon.png' | asset_url }}">
+    <link rel="apple-touch-icon" href="{{ 'Favicon.png' | asset_url }}">
 
     <title>
         {{ page_title }}{% unless page_title contains shop.name %} – {{ shop.name }}{% endunless %}
