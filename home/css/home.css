@@ -93,7 +93,7 @@ nav a:hover::after {
 }
 
 /* ========================================
-   CONTENT OVERLAY (for future content)
+   CONTENT OVERLAY
    ======================================== */
 
 .content-overlay {
@@ -115,6 +115,33 @@ nav a:hover::after {
 }
 
 /* ========================================
+   BRAND TITLE
+   ======================================== */
+
+.brand-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 300;
+    color: var(--sponge-white);
+    letter-spacing: 0.2em;
+    text-align: center;
+    opacity: 0;
+    animation: titleFadeIn 2s ease 0.5s forwards;
+    text-shadow: 0 0 60px rgba(155, 143, 217, 0.3);
+}
+
+@keyframes titleFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 0.95;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
    RESPONSIVE ADJUSTMENTS
    ======================================== */
 
@@ -130,6 +157,11 @@ nav a:hover::after {
     
     .nav-container {
         padding: 1.5rem 0;
+    }
+    
+    .brand-title {
+        font-size: clamp(2rem, 14vw, 4rem);
+        letter-spacing: 0.15em;
     }
 }
 
