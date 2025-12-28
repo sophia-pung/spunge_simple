@@ -3,6 +3,11 @@
     Full-screen WebGL Aurora Borealis background with navigation
 {% endcomment %}
 
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
 <!-- Loading Screen -->
 <div class="loading" id="loading">
     <span class="loading-text">loading</span>
@@ -20,17 +25,160 @@
     </nav>
 </div>
 
-<!-- Content Overlay -->
+<!-- Content Overlay with Brand Title -->
 <div class="content-overlay">
-    {% if section.settings.show_title %}
-        <h1 class="hero-title">{{ section.settings.title }}</h1>
-    {% endif %}
+    <h1 class="brand-title">SPoNGe</h1>
 </div>
 
-<!-- Aurora Shader Script -->
-<script type="module">
-    {{ 'home.js' | asset_url | script_tag }}
-</script>
+<style>
+    :root {
+        --sponge-bg: #0a0a0f;
+        --sponge-violet: #9B8FD9;
+        --sponge-white: #F5F5F5;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .aurora-hero-section {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        font-family: 'Libre Baskerville', Georgia, serif;
+        background: var(--sponge-bg);
+        display: block;
+    }
+
+    /* Loading Screen */
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: var(--sponge-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .loading.fade-out {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loading-text {
+        font-size: 1rem;
+        letter-spacing: 0.3em;
+        color: var(--sponge-violet);
+        text-transform: lowercase;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
+
+    /* Canvas */
+    #aurora-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+    }
+
+    /* Navigation */
+    .nav-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 2rem 3rem;
+    }
+
+    nav {
+        display: flex;
+        justify-content: center;
+        gap: 4rem;
+    }
+
+    nav a {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.9rem;
+        letter-spacing: 0.15em;
+        text-decoration: none;
+        color: var(--sponge-white);
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+        text-transform: lowercase;
+    }
+
+    nav a:hover {
+        opacity: 1;
+    }
+
+    /* Content Overlay */
+    .content-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    /* Brand Title */
+    .brand-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: clamp(3rem, 10vw, 8rem);
+        font-weight: 300;
+        color: #FFFFFF;
+        letter-spacing: 0.2em;
+        text-align: center;
+        opacity: 0;
+        animation: titleFadeIn 2s ease 0.5s forwards;
+        text-shadow: 0 0 60px rgba(155, 143, 217, 0.3);
+    }
+
+    @keyframes titleFadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 0.95;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        nav {
+            gap: 2rem;
+        }
+
+        nav a {
+            font-size: 0.8rem;
+        }
+
+        .brand-title {
+            font-size: clamp(2rem, 14vw, 4rem);
+            letter-spacing: 0.15em;
+        }
+    }
+</style>
 
 <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';

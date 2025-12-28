@@ -1,6 +1,6 @@
 {% comment %}
     Collection Section - SPoNGe
-    Shop page with aurora aesthetic
+    Shop page with aurora aesthetic - Buy Button Style
 {% endcomment %}
 
 <!-- Navigation -->
@@ -13,35 +13,21 @@
     </div>
 </nav>
 
-<!-- Background Gradient -->
+<!-- Background -->
 <div class="shop-bg"></div>
 
 <!-- Main Content -->
 <main class="shop-main">
-    <!-- Header -->
     <header class="collection-header">
         <h1>{{ collection.title | default: 'Shop' }}</h1>
-        {% if collection.description != blank %}
-            <p class="collection-description">{{ collection.description }}</p>
-        {% endif %}
-        
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <span class="product-count">{{ collection.products.size }} {{ collection.products.size | pluralize: 'piece', 'pieces' }}</span>
-            <div class="filter-options">
-                <button class="filter-btn active" data-filter="all">All</button>
-                {% for tag in collection.all_tags limit: 5 %}
-                    <button class="filter-btn" data-filter="{{ tag | handleize }}">{{ tag }}</button>
-                {% endfor %}
-            </div>
-        </div>
+        <p class="collection-description">Pieces crafted at the intersection of art, technology, and fashion.</p>
     </header>
     
     <!-- Product Grid -->
     <div class="product-grid">
         {% for product in collection.products %}
-            <a href="{{ product.url }}" class="product-card" data-tags="{{ product.tags | join: ' ' | handleize }}">
-                <div class="product-card-image">
+            <div class="product-card">
+                <a href="{{ product.url }}" class="product-image-link">
                     {% if product.featured_image %}
                         <img src="{{ product.featured_image | img_url: '600x' }}" 
                              alt="{{ product.title }}"
@@ -55,23 +41,20 @@
                             </svg>
                         </div>
                     {% endif %}
-                    <div class="product-overlay">
-                        <span class="quick-view">View Details</span>
-                    </div>
-                </div>
-                <div class="product-card-info">
-                    <h3>{{ product.title }}</h3>
-                    <div class="product-meta">
-                        <p class="product-price">{{ product.price | money }}</p>
-                        {% if product.compare_at_price > product.price %}
-                            <p class="product-compare">{{ product.compare_at_price | money }}</p>
-                        {% endif %}
-                    </div>
-                    {% if product.available == false %}
-                        <span class="sold-out-badge">Sold Out</span>
+                </a>
+                <div class="product-info">
+                    <a href="{{ product.url }}" class="product-title">{{ product.title }}</a>
+                    <p class="product-price">{{ product.price | money }}</p>
+                    {% if product.available %}
+                        <form method="post" action="/cart/add">
+                            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                            <button type="submit" class="add-to-cart-btn">ADD TO CART</button>
+                        </form>
+                    {% else %}
+                        <button class="add-to-cart-btn sold-out" disabled>SOLD OUT</button>
                     {% endif %}
                 </div>
-            </a>
+            </div>
         {% else %}
             <!-- Empty State -->
             <div class="empty-collection">
@@ -90,23 +73,14 @@
 </main>
 
 <style>
-    /* ========================================
-       SHOP PAGE - SPONGE
-       ======================================== */
-    
     :root {
         --sponge-black: #0a0a0c;
         --sponge-white: #f5f5f7;
         --sponge-violet: #9b8fd9;
         --sponge-blue: #4a90d9;
-        --sponge-yellow: #f5d547;
     }
     
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
         background: var(--sponge-black);
@@ -115,10 +89,7 @@
         min-height: 100vh;
     }
     
-    /* ========================================
-       NAVIGATION
-       ======================================== */
-    
+    /* Navigation */
     .shop-nav {
         position: fixed;
         top: 0;
@@ -140,10 +111,7 @@
         text-decoration: none;
     }
     
-    .nav-links {
-        display: flex;
-        gap: 3rem;
-    }
+    .nav-links { display: flex; gap: 3rem; }
     
     .nav-links a {
         font-size: 0.9rem;
@@ -154,15 +122,9 @@
         transition: opacity 0.3s ease;
     }
     
-    .nav-links a:hover,
-    .nav-links a.active {
-        opacity: 1;
-    }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
     
-    /* ========================================
-       BACKGROUND
-       ======================================== */
-    
+    /* Background */
     .shop-bg {
         position: fixed;
         top: 0;
@@ -177,25 +139,20 @@
         z-index: 0;
     }
     
-    /* ========================================
-       MAIN CONTENT
-       ======================================== */
-    
+    /* Main Content */
     .shop-main {
         position: relative;
         z-index: 10;
         min-height: 100vh;
         padding: 8rem 4rem 4rem;
-        max-width: 1600px;
+        max-width: 1400px;
         margin: 0 auto;
     }
     
-    /* ========================================
-       HEADER
-       ======================================== */
-    
+    /* Header - Centered */
     .collection-header {
         margin-bottom: 4rem;
+        text-align: center;
     }
     
     .collection-header h1 {
@@ -209,104 +166,49 @@
         font-size: 1.1rem;
         color: rgba(255, 255, 255, 0.6);
         max-width: 600px;
+        margin: 0 auto;
         line-height: 1.7;
-        margin-bottom: 2rem;
     }
     
-    /* ========================================
-       FILTER BAR
-       ======================================== */
-    
-    .filter-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .product-count {
-        font-family: 'Courier New', monospace;
-        font-size: 0.85rem;
-        color: rgba(255, 255, 255, 0.5);
-        letter-spacing: 0.1em;
-    }
-    
-    .filter-options {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .filter-btn {
-        padding: 0.6rem 1.2rem;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: rgba(255, 255, 255, 0.6);
-        font-family: 'Courier New', monospace;
-        font-size: 0.8rem;
-        letter-spacing: 0.1em;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .filter-btn:hover {
-        border-color: rgba(255, 255, 255, 0.3);
-        color: var(--sponge-white);
-    }
-    
-    .filter-btn.active {
-        background: rgba(155, 143, 217, 0.15);
-        border-color: var(--sponge-violet);
-        color: var(--sponge-white);
-    }
-    
-    /* ========================================
-       PRODUCT GRID
-       ======================================== */
-    
+    /* Product Grid */
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 3rem 2rem;
-        padding-top: 2rem;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 50px 30px;
     }
     
-    /* ========================================
-       PRODUCT CARD
-       ======================================== */
-    
+    /* Product Card */
     .product-card {
-        text-decoration: none;
-        color: inherit;
+        text-align: center;
+    }
+    
+    .product-image-link {
         display: block;
-        transition: transform 0.4s ease;
-    }
-    
-    .product-card:hover {
-        transform: translateY(-8px);
-    }
-    
-    .product-card-image {
         position: relative;
-        aspect-ratio: 3/4;
+        padding-top: 100%;
+        margin-bottom: 1rem;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.02);
-        margin-bottom: 1.5rem;
     }
     
-    .product-card-image img {
+    .product-image-link img {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s ease, filter 0.4s ease;
+        transition: transform 0.6s ease;
     }
     
-    .product-card:hover .product-card-image img {
+    .product-card:hover .product-image-link img {
         transform: scale(1.05);
     }
     
     .placeholder-image {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         display: flex;
@@ -321,84 +223,63 @@
         opacity: 0.2;
     }
     
-    .product-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(10, 10, 12, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.4s ease;
+    /* Product Info */
+    .product-info {
+        padding: 0.5rem;
     }
     
-    .product-card:hover .product-overlay {
-        opacity: 1;
-    }
-    
-    .quick-view {
-        padding: 0.8rem 1.5rem;
-        border: 1px solid var(--sponge-white);
-        font-family: 'Courier New', monospace;
-        font-size: 0.8rem;
-        letter-spacing: 0.15em;
-        transition: all 0.3s ease;
-    }
-    
-    .product-card:hover .quick-view {
-        background: var(--sponge-white);
-        color: var(--sponge-black);
-    }
-    
-    /* ========================================
-       PRODUCT INFO
-       ======================================== */
-    
-    .product-card-info {
-        position: relative;
-    }
-    
-    .product-card-info h3 {
+    .product-title {
+        display: block;
+        font-family: Georgia, serif;
         font-size: 1rem;
         font-weight: 400;
+        color: var(--sponge-white);
         letter-spacing: 0.1em;
+        text-decoration: none;
         margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
     }
     
-    .product-meta {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+    .product-title:hover {
+        color: var(--sponge-violet);
     }
     
     .product-price {
         font-family: 'Courier New', monospace;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 1rem;
     }
     
-    .product-compare {
+    /* Add to Cart Button */
+    .add-to-cart-btn {
         font-family: 'Courier New', monospace;
         font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.4);
-        text-decoration: line-through;
+        letter-spacing: 0.15em;
+        padding: 12px 24px;
+        background-color: transparent;
+        border: 1px solid var(--sponge-white);
+        color: var(--sponge-white);
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
     
-    .sold-out-badge {
-        display: inline-block;
-        margin-top: 0.5rem;
-        padding: 0.3rem 0.8rem;
-        background: rgba(255, 255, 255, 0.05);
-        font-family: 'Courier New', monospace;
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
-        color: rgba(255, 255, 255, 0.5);
+    .add-to-cart-btn:hover {
+        background-color: var(--sponge-white);
+        color: var(--sponge-black);
     }
     
-    /* ========================================
-       EMPTY STATE
-       ======================================== */
+    .add-to-cart-btn.sold-out {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
     
+    .add-to-cart-btn.sold-out:hover {
+        background-color: transparent;
+        color: var(--sponge-white);
+    }
+    
+    /* Empty State */
     .empty-collection {
         grid-column: 1 / -1;
         text-align: center;
@@ -446,18 +327,11 @@
         background: rgba(155, 143, 217, 0.15);
     }
     
-    /* ========================================
-       RESPONSIVE
-       ======================================== */
-    
+    /* Responsive */
     @media (max-width: 1024px) {
-        .shop-main {
-            padding: 7rem 2rem 3rem;
-        }
-        
         .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 2rem 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px 20px;
         }
     }
     
@@ -470,54 +344,28 @@
             gap: 1.5rem;
         }
         
-        .filter-bar {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-        
-        .filter-options {
-            flex-wrap: wrap;
+        .shop-main {
+            padding: 7rem 2rem 3rem;
         }
         
         .product-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem 1rem;
+            gap: 30px 15px;
         }
         
-        .product-card-image {
-            aspect-ratio: 4/5;
+        .add-to-cart-btn {
+            padding: 10px 18px;
+            font-size: 0.7rem;
         }
     }
     
     @media (max-width: 480px) {
         .product-grid {
             grid-template-columns: 1fr;
+            gap: 40px;
         }
     }
 </style>
-
-<script>
-    // Filter functionality
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update active state
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const filter = btn.dataset.filter;
-            
-            document.querySelectorAll('.product-card').forEach(card => {
-                if (filter === 'all') {
-                    card.style.display = 'block';
-                } else {
-                    const tags = card.dataset.tags || '';
-                    card.style.display = tags.includes(filter) ? 'block' : 'none';
-                }
-            });
-        });
-    });
-</script>
 
 {% schema %}
 {
