@@ -1,6 +1,5 @@
 {% comment %}
-    Buy Button Collection Section - SPoNGe
-    Shopify Buy Button with custom SPoNGe styling
+    SPoNGe Shop - Custom Product Page with Image Carousel
 {% endcomment %}
 
 <!-- Navigation -->
@@ -9,7 +8,7 @@
     <div class="nav-links">
         <a href="/pages/about">About</a>
         <a href="/pages/launch">Launch</a>
-        <a href="/collections/all" class="active">Shop</a>
+        <a href="/pages/shop" class="active">Shop</a>
     </div>
 </nav>
 
@@ -18,21 +17,72 @@
 
 <!-- Main Content -->
 <main class="shop-main">
-    <header class="collection-header">
-        <h1>{{ section.settings.title | default: 'Shop' }}</h1>
-        <p class="collection-description">{{ section.settings.description | default: 'Pieces crafted at the intersection of art, technology, and fashion.' }}</p>
-    </header>
-    
-    <!-- Shopify Buy Button Container -->
-    <div id="collection-component-sponge"></div>
+    <div class="product-container">
+        <!-- Image Gallery -->
+        <div class="gallery">
+            <div class="gallery-main">
+                <img id="main-image" src="{{ 'GGBSocksSide.png' | asset_url }}" alt="Do What You Love Socks">
+                <button class="gallery-arrow gallery-prev" onclick="prevImage()">‹</button>
+                <button class="gallery-arrow gallery-next" onclick="nextImage()">›</button>
+            </div>
+            <div class="gallery-thumbs">
+                <button class="thumb active" onclick="setImage(0)" data-index="0">
+                    <img src="{{ 'GGBSocksSide.png' | asset_url }}" alt="Thumbnail 1">
+                </button>
+                <button class="thumb" onclick="setImage(1)" data-index="1">
+                    <img src="{{ 'GGBSockSide.png' | asset_url }}" alt="Thumbnail 2">
+                </button>
+                <button class="thumb" onclick="setImage(2)" data-index="2">
+                    <img src="{{ 'GGB.jpg' | asset_url }}" alt="Thumbnail 3">
+                </button>
+                <button class="thumb" onclick="setImage(3)" data-index="3">
+                    <img src="{{ 'FluffySocks.png' | asset_url }}" alt="Thumbnail 4">
+                </button>
+                <button class="thumb" onclick="setImage(4)" data-index="4">
+                    <img src="{{ 'Socks.png' | asset_url }}" alt="Thumbnail 5">
+                </button>
+            </div>
+        </div>
+        
+        <!-- Product Info -->
+        <div class="product-info">
+            <h1 class="product-title">Do What You Love Socks</h1>
+            <p class="product-price">$12.00</p>
+            
+            <p class="product-description">
+                These socks are warm and cozy just like the warm feeling the California sun gives me as it's rays roll down my back across the Golden Gate Bridge on a warm summer's day.
+            </p>
+            
+            <div class="product-details">
+                <div class="detail-item">
+                    <span class="detail-label">MATERIAL</span>
+                    <span class="detail-value">80% Cotton, 17% Polyester, 3% Spandex</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">SIZE</span>
+                    <span class="detail-value">One Size Fits Most</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">CARE</span>
+                    <span class="detail-value">Machine wash cold, tumble dry low</span>
+                </div>
+            </div>
+            
+            <!-- Shopify Buy Button will be injected here -->
+            <div id="product-buy-button"></div>
+        </div>
+    </div>
 </main>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
+    
     :root {
         --sponge-black: #0a0a0c;
         --sponge-white: #f5f5f7;
         --sponge-violet: #9b8fd9;
         --sponge-blue: #4a90d9;
+        --sponge-gray: rgba(255, 255, 255, 0.5);
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +90,7 @@
     body {
         background: var(--sponge-black);
         color: var(--sponge-white);
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: 'Cormorant Garamond', Georgia, serif;
         min-height: 100vh;
     }
     
@@ -59,7 +109,7 @@
     }
     
     .nav-logo {
-        font-family: 'Courier New', monospace;
+        font-family: 'Space Mono', monospace;
         font-size: 1.2rem;
         letter-spacing: 0.3em;
         color: var(--sponge-white);
@@ -69,7 +119,8 @@
     .nav-links { display: flex; gap: 3rem; }
     
     .nav-links a {
-        font-size: 0.9rem;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.8rem;
         letter-spacing: 0.15em;
         color: var(--sponge-white);
         text-decoration: none;
@@ -85,10 +136,10 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 50vh;
+        bottom: 0;
         background: 
-            radial-gradient(ellipse 100% 70% at 50% 0%, rgba(155, 143, 217, 0.08) 0%, transparent 50%),
-            radial-gradient(ellipse 80% 50% at 30% 10%, rgba(74, 144, 217, 0.05) 0%, transparent 40%),
+            radial-gradient(ellipse 120% 80% at 20% 80%, rgba(155, 143, 217, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse 100% 60% at 80% 20%, rgba(74, 144, 217, 0.06) 0%, transparent 40%),
             var(--sponge-black);
         pointer-events: none;
         z-index: 0;
@@ -104,50 +155,247 @@
         margin: 0 auto;
     }
     
-    /* Header */
-    .collection-header {
-        margin-bottom: 4rem;
-        text-align: center;
+    /* Product Container */
+    .product-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6rem;
+        align-items: start;
     }
     
-    .collection-header h1 {
-        font-size: clamp(2rem, 5vw, 3.5rem);
-        font-weight: 400;
-        letter-spacing: 0.15em;
+    /* Gallery */
+    .gallery {
+        position: sticky;
+        top: 8rem;
+    }
+    
+    .gallery-main {
+        position: relative;
+        aspect-ratio: 1;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
         margin-bottom: 1rem;
     }
     
-    .collection-description {
+    .gallery-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.4s ease;
+    }
+    
+    .gallery-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        background: rgba(10, 10, 12, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--sponge-white);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .gallery-arrow:hover {
+        background: rgba(155, 143, 217, 0.3);
+        border-color: var(--sponge-violet);
+    }
+    
+    .gallery-prev { left: 1rem; }
+    .gallery-next { right: 1rem; }
+    
+    .gallery-thumbs {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .thumb {
+        aspect-ratio: 1;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.02);
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+    
+    .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+    
+    .thumb:hover img,
+    .thumb.active img {
+        opacity: 1;
+    }
+    
+    .thumb.active {
+        border-color: var(--sponge-violet);
+        box-shadow: 0 0 20px rgba(155, 143, 217, 0.3);
+    }
+    
+    /* Product Info */
+    .product-info {
+        padding-top: 2rem;
+    }
+    
+    .product-tag {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        color: var(--sponge-violet);
+        display: inline-block;
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--sponge-violet);
+    }
+    
+    .product-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+    
+    .product-price {
+        font-family: 'Space Mono', monospace;
+        font-size: 1.5rem;
+        color: var(--sponge-white);
+        margin-bottom: 2rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .product-description {
         font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.6);
-        max-width: 600px;
-        margin: 0 auto;
-        line-height: 1.7;
+        line-height: 1.8;
+        color: var(--sponge-gray);
+        margin-bottom: 3rem;
+        max-width: 500px;
     }
     
-    /* ========================================
-       SHOPIFY BUY BUTTON OVERRIDES
-       ======================================== */
-    
-    /* Product Grid */
-    #collection-component-sponge iframe {
-        background: transparent !important;
+    .product-details {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 2rem;
+        margin-bottom: 3rem;
     }
     
-    /* Override Shopify's styles via CSS custom properties */
-    #collection-component-sponge {
-        --shopify-buy-btn-bg: transparent;
-        --shopify-buy-btn-color: #f5f5f7;
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .detail-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        color: var(--sponge-gray);
+    }
+    
+    .detail-value {
+        font-size: 0.9rem;
+        color: var(--sponge-white);
+        text-align: right;
+    }
+    
+    /* Buy Button Container */
+    #product-buy-button {
+        margin-top: 2rem;
     }
     
     /* Responsive */
-    @media (max-width: 768px) {
-        .shop-nav { padding: 1.5rem 2rem; }
+    @media (max-width: 968px) {
+        .product-container {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+        
+        .gallery {
+            position: relative;
+            top: 0;
+        }
+        
+        .shop-main {
+            padding: 7rem 2rem 3rem;
+        }
+    }
+    
+    @media (max-width: 600px) {
+        .shop-nav {
+            padding: 1.5rem 1.5rem;
+        }
+        
         .nav-links { gap: 1.5rem; }
-        .shop-main { padding: 7rem 2rem 3rem; }
+        
+        .nav-links a { font-size: 0.7rem; }
+        
+        .gallery-thumbs {
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .gallery-arrow {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .shop-main {
+            padding: 6rem 1rem 2rem;
+        }
     }
 </style>
 
+<script>
+// Image carousel functionality
+const images = [
+    '{{ "GGBSocksSide.png" | asset_url }}',
+    '{{ "GGBSockSide.png" | asset_url }}',
+    '{{ "GGB.jpg" | asset_url }}',
+    '{{ "FluffySocks.png" | asset_url }}',
+    '{{ "Socks.png" | asset_url }}'
+];
+
+let currentIndex = 0;
+
+function setImage(index) {
+    currentIndex = index;
+    document.getElementById('main-image').src = images[index];
+    
+    // Update active thumbnail
+    document.querySelectorAll('.thumb').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+    });
+}
+
+function nextImage() {
+    setImage((currentIndex + 1) % images.length);
+}
+
+function prevImage() {
+    setImage((currentIndex - 1 + images.length) % images.length);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+});
+</script>
+
+<!-- Shopify Buy Button -->
 <script type="text/javascript">
 (function () {
     var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
@@ -176,133 +424,74 @@
         });
         
         ShopifyBuy.UI.onReady(client).then(function (ui) {
-            ui.createComponent('collection', {
-                id: '476815425782',
-                node: document.getElementById('collection-component-sponge'),
+            ui.createComponent('product', {
+                id: '9671893655798',
+                node: document.getElementById('product-buy-button'),
                 moneyFormat: '%24%7B%7Bamount%7D%7D',
                 options: {
                     "product": {
-                        "styles": {
-                            "product": {
-                                "@media (min-width: 601px)": {
-                                    "max-width": "calc(33.33% - 30px)",
-                                    "margin-left": "30px",
-                                    "margin-bottom": "50px",
-                                    "width": "calc(33.33% - 30px)"
-                                },
-                                "img": {
-                                    "height": "calc(100% - 15px)",
-                                    "position": "absolute",
-                                    "left": "0",
-                                    "right": "0",
-                                    "top": "0"
-                                },
-                                "imgWrapper": {
-                                    "padding-top": "calc(100% + 15px)",
-                                    "position": "relative",
-                                    "height": "0"
-                                }
-                            },
-                            "title": {
-                                "font-family": "Georgia, serif",
-                                "font-size": "1rem",
-                                "color": "#f5f5f7",
-                                "letter-spacing": "0.1em",
-                                "font-weight": "400"
-                            },
-                            "price": {
-                                "font-family": "'Courier New', monospace",
-                                "font-size": "0.9rem",
-                                "color": "rgba(255, 255, 255, 0.7)"
-                            },
-                            "button": {
-                                "font-family": "'Courier New', monospace",
-                                "font-size": "0.8rem",
-                                "letter-spacing": "0.15em",
-                                "padding": "12px 24px",
-                                "background-color": "transparent",
-                                "border": "1px solid #f5f5f7",
-                                "color": "#f5f5f7",
-                                ":hover": {
-                                    "background-color": "#f5f5f7",
-                                    "color": "#0a0a0c"
-                                },
-                                ":focus": {
-                                    "background-color": "#f5f5f7",
-                                    "color": "#0a0a0c"
-                                },
-                                "border-radius": "0px"
-                            }
-                        },
-                        "text": {
-                            "button": "ADD TO CART"
-                        }
-                    },
-                    "productSet": {
-                        "styles": {
-                            "products": {
-                                "@media (min-width: 601px)": {
-                                    "margin-left": "-30px"
-                                }
-                            }
-                        }
-                    },
-                    "modalProduct": {
                         "contents": {
                             "img": false,
-                            "imgWithCarousel": true,
-                            "button": false,
-                            "buttonWithQuantity": true
+                            "title": false,
+                            "price": false,
+                            "description": false,
+                            "buttonWithQuantity": true,
+                            "button": false
                         },
                         "styles": {
                             "product": {
                                 "@media (min-width: 601px)": {
                                     "max-width": "100%",
-                                    "margin-left": "0px",
-                                    "margin-bottom": "0px"
+                                    "margin-left": "0",
+                                    "margin-bottom": "0"
                                 }
                             },
                             "button": {
-                                "font-family": "'Courier New', monospace",
-                                "font-size": "0.85rem",
-                                "letter-spacing": "0.15em",
-                                "padding": "14px 28px",
-                                "background-color": "linear-gradient(135deg, #9b8fd9, #4a90d9)",
+                                "font-family": "'Space Mono', 'Courier New', monospace",
+                                "font-size": "0.8rem",
+                                "letter-spacing": "0.2em",
+                                "padding": "18px 48px",
+                                "background": "linear-gradient(135deg, #9b8fd9 0%, #4a90d9 100%)",
                                 "border": "none",
+                                "color": "#0a0a0c",
+                                "font-weight": "700",
                                 ":hover": {
-                                    "background-color": "#9b8fd9"
+                                    "background": "linear-gradient(135deg, #b8a9e8 0%, #6aa8e8 100%)"
+                                },
+                                ":focus": {
+                                    "background": "linear-gradient(135deg, #b8a9e8 0%, #6aa8e8 100%)"
                                 },
                                 "border-radius": "0px"
                             },
-                            "title": {
-                                "font-family": "Georgia, serif",
-                                "font-weight": "400",
-                                "letter-spacing": "0.1em"
+                            "quantityInput": {
+                                "font-family": "'Space Mono', monospace",
+                                "font-size": "1rem",
+                                "border": "1px solid rgba(255,255,255,0.2)",
+                                "background": "transparent",
+                                "color": "#f5f5f7"
                             },
-                            "price": {
-                                "font-family": "'Courier New', monospace"
+                            "quantityDecrement": {
+                                "border": "1px solid rgba(255,255,255,0.2)",
+                                "background": "transparent",
+                                "color": "#f5f5f7"
+                            },
+                            "quantityIncrement": {
+                                "border": "1px solid rgba(255,255,255,0.2)",
+                                "background": "transparent",
+                                "color": "#f5f5f7"
                             }
                         },
                         "text": {
                             "button": "ADD TO CART"
                         }
                     },
-                    "option": {
-                        "styles": {
-                            "label": {
-                                "font-family": "'Courier New', monospace",
-                                "font-size": "0.8rem",
-                                "letter-spacing": "0.1em"
-                            }
-                        }
-                    },
                     "cart": {
                         "styles": {
                             "button": {
-                                "font-family": "'Courier New', monospace",
+                                "font-family": "'Space Mono', monospace",
                                 "font-size": "0.85rem",
                                 "letter-spacing": "0.15em",
-                                "padding": "14px 28px",
+                                "padding": "16px 32px",
                                 "background-color": "#9b8fd9",
                                 ":hover": {
                                     "background-color": "#7b6ba6"
@@ -310,7 +499,8 @@
                                 "border-radius": "0px"
                             },
                             "title": {
-                                "font-family": "Georgia, serif"
+                                "font-family": "'Cormorant Garamond', Georgia, serif",
+                                "color": "#f5f5f7"
                             },
                             "footer": {
                                 "background-color": "#0a0a0c"
@@ -320,6 +510,27 @@
                             },
                             "header": {
                                 "color": "#f5f5f7"
+                            },
+                            "lineItems": {
+                                "color": "#f5f5f7"
+                            },
+                            "subtotalText": {
+                                "color": "rgba(255,255,255,0.7)"
+                            },
+                            "subtotal": {
+                                "color": "#f5f5f7"
+                            },
+                            "notice": {
+                                "color": "rgba(255,255,255,0.7)"
+                            },
+                            "close": {
+                                "color": "#f5f5f7",
+                                ":hover": {
+                                    "color": "#9b8fd9"
+                                }
+                            },
+                            "empty": {
+                                "color": "rgba(255,255,255,0.5)"
                             }
                         },
                         "text": {
@@ -334,6 +545,9 @@
                                 ":hover": {
                                     "background-color": "#7b6ba6"
                                 }
+                            },
+                            "count": {
+                                "color": "#0a0a0c"
                             }
                         }
                     }
@@ -346,28 +560,14 @@
 
 {% schema %}
 {
-    "name": "Buy Button Collection",
+    "name": "SPoNGe Shop",
     "tag": "section",
-    "class": "buy-button-section",
-    "settings": [
-        {
-            "type": "text",
-            "id": "title",
-            "label": "Title",
-            "default": "Shop"
-        },
-        {
-            "type": "textarea",
-            "id": "description",
-            "label": "Description",
-            "default": "Pieces crafted at the intersection of art, technology, and fashion."
-        }
-    ],
+    "class": "sponge-shop-section",
+    "settings": [],
     "presets": [
         {
-            "name": "Buy Button Collection"
+            "name": "SPoNGe Shop"
         }
     ]
 }
 {% endschema %}
-

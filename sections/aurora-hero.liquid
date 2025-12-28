@@ -21,7 +21,7 @@
     <nav>
         <a href="{{ pages['about'].url | default: '/pages/about' }}">About</a>
         <a href="{{ pages['launch'].url | default: '/pages/launch' }}">Launch</a>
-        <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}">Shop</a>
+        <a href="/pages/shop">Shop</a>
     </nav>
 </div>
 
@@ -119,7 +119,6 @@
         color: var(--sponge-white);
         opacity: 0.8;
         transition: opacity 0.3s ease;
-        text-transform: lowercase;
     }
 
     nav a:hover {
